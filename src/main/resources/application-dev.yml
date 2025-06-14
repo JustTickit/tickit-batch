@@ -2,6 +2,8 @@ spring:
   batch:
     jdbc:
       initialize-schema: always
+    job:
+      name: tickerJob
 
   datasource:
     url: jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/tickit
@@ -12,11 +14,10 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
     properties:
       hibernate:
         format_sql: true
 
 logging:
   level:
-    org.hibernate.SQL: debug
+    com.tickit.batch: INFO
