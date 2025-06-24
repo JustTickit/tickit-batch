@@ -11,12 +11,12 @@ public class TickerStepListener implements StepExecutionListener {
 
 	@Override
 	public void beforeStep(StepExecution stepExecution) {
-		log.info("▶️ [TickerStep] Step 시작: {}", stepExecution.getStepName());
+		log.info("[TickerStep] Step 시작: {}", stepExecution.getStepName());
 	}
 
 	@Override
 	public ExitStatus afterStep(StepExecution stepExecution) {
-		log.info("⏹ [TickerStep] Step 종료 - ReadCount: {}, WriteCount: {}, ExitStatus: {}, Status: {}",
+		log.info("[TickerStep] Step 종료 - ReadCount: {}, WriteCount: {}, ExitStatus: {}, Status: {}",
 			stepExecution.getReadCount(),
 			stepExecution.getWriteCount(),
 			stepExecution.getExitStatus(),
