@@ -7,6 +7,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.tickit.batch.adapter.upbit.dto.MarketCodeResponse;
 import com.tickit.batch.adapter.upbit.dto.TickerResponse;
+import com.tickit.batch.logging.TraceContext;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +20,9 @@ public class UpbitClient {
 	private final WebClient webClient = WebClient.create("https://api.upbit.com");
 
 	public List<MarketCodeResponse> getMarketCodes() {
-		log.info("[Upbit] MarketCode 요청 시작");
+		// log.info("[Upbit] MarketCode 요청 시작");
+		log.info("[{}] [Upbit] MarketCode 요청 시작", TraceContext.getTraceId());
+
 		try {
 			List<MarketCodeResponse> result = webClient.get()
 				.uri("/v1/market/all?isDetails=false")
@@ -27,17 +30,24 @@ public class UpbitClient {
 				.bodyToFlux(MarketCodeResponse.class)
 				.collectList()
 				.block();
-			log.info("[Upbit] MarketCode 요청 성공: 수신된 마켓 수 = {}", result.size());
+
+			// log.info("[Upbit] MarketCode 요청 성공: 수신된 마켓 수 = {}", result.size());
+			log.info("[{}] [Upbit] MarketCode 요청 성공: 수신된 마켓 수 = {}", TraceContext.getTraceId(), result.size());
+
 			return result;
-		} catch (Exception e){
-			log.error("[Upbit] MarketCode 요청 실패: {}", e.getMessage(), e);
+		} catch (Exception e) {
+			// log.error("[Upbit] MarketCode 요청 실패: {}", e.getMessage(), e);
+			log.error("[{}] [Upbit] MarketCode 요청 실패: {}", TraceContext.getTraceId(), e.getMessage(), e);
 			throw e;
 		}
 	}
 
 	public List<TickerResponse> getTickers(List<String> markets) {
 		String marketParam = String.join(",", markets);
-		log.info("[Upbit] Ticker 요청 시작: 요청 마켓 수 = {}", markets.size());
+
+		// log.info("[Upbit] Ticker 요청 시작: 요청 마켓 수 = {}", markets.size());
+		log.info("[{}] [Upbit] Ticker 요청 시작: 요청 마켓 수 = {}", TraceContext.getTraceId(), markets.size());
+
 		try {
 			List<TickerResponse> result = webClient.get()
 				.uri(uriBuilder -> uriBuilder
@@ -48,10 +58,14 @@ public class UpbitClient {
 				.bodyToFlux(TickerResponse.class)
 				.collectList()
 				.block();
-			log.info("[Upbit] Ticker 요청 성공: 응답 받은 티커 수 = {}", result.size());
+
+			// log.info("[Upbit] Ticker 요청 성공: 응답 받은 티커 수 = {}", result.size());
+			log.info("[{}] [Upbit] Ticker 요청 성공: 응답 받은 티커 수 = {}", TraceContext.getTraceId(), result.size());
+
 			return result;
-		} catch (Exception e){
-			log.error("[Upbit] Ticker 요청 실패: {}", e.getMessage(), e);
+		} catch (Exception e) {
+			// log.error("[Upbit] Ticker 요청 실패: {}", e.getMessage(), e);
+			log.error("[{}] [Upbit] Ticker 요청 실패: {}", TraceContext.getTraceId(), e.getMessage(), e);
 			throw e;
 		}
 	}

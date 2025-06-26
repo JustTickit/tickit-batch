@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 import com.tickit.batch.adapter.upbit.dto.TickerResponse;
+import com.tickit.batch.logging.TraceContext;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,7 +14,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Entity
 @Table(name = "ticker")
 @Getter
@@ -85,6 +88,68 @@ public class Ticker {
 	}
 
 	public void update(Ticker newTicker) {
+		boolean changed = false;
+
+		if (this.tradePrice.compareTo(newTicker.tradePrice) != 0) {
+			log.info("""
+					[{}]
+					[Writer] 시세 변동
+					  마켓: {}
+					  tradePrice: {} → {}
+					""",
+				TraceContext.getTraceId(), market,
+				this.tradePrice.toPlainString(), newTicker.tradePrice.toPlainString());
+			changed = true;
+		}
+		if (this.signedChangePrice.compareTo(newTicker.signedChangePrice) != 0) {
+			log.info("""
+					[{}]
+					[Writer] 시세 변동
+					마켓: {}
+					signedChangePrice: {} → {}
+					""", TraceContext.getTraceId(), market,
+				this.signedChangePrice.toPlainString(), newTicker.signedChangePrice.toPlainString());
+			changed = true;
+		}
+		if (this.signedChangeRate.compareTo(newTicker.signedChangeRate) != 0) {
+			log.info("""
+					[{}]
+					[Writer] 시세 변동
+					마켓: {}
+					signedChangeRate: {} → {}
+					""", TraceContext.getTraceId(), market,
+				this.signedChangeRate.toPlainString(), newTicker.signedChangeRate.toPlainString());
+			changed = true;
+		}
+		if (this.accTradeVolume.compareTo(newTicker.accTradeVolume) != 0) {
+			log.info("""
+					[{}]
+					[Writer] 시세 변동
+					마켓: {}
+					accTradeVolume: {} → {}
+					""", TraceContext.getTraceId(), market,
+				this.accTradeVolume.toPlainString(), newTicker.accTradeVolume.toPlainString());
+			changed = true;
+		}
+		if (this.timestamp.compareTo(newTicker.timestamp) != 0) {
+			log.info("""
+					[{}]
+					[Writer] 시세 변동
+					마켓: {}
+					timestamp: {} → {}
+					""", TraceContext.getTraceId(), market,
+				this.timestamp, newTicker.timestamp);
+			changed = true;
+		}
+
+		if (!changed) {
+			log.debug("""
+				[{}]
+				[Writer]
+				마켓 {}: 시세 데이터에 변화 없음
+				""", TraceContext.getTraceId(), market);
+		}
+
 		this.tradePrice = newTicker.tradePrice;
 		this.signedChangePrice = newTicker.signedChangePrice;
 		this.signedChangeRate = newTicker.signedChangeRate;
