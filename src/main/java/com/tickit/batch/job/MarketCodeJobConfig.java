@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import com.tickit.batch.listener.MarketCodeJobListener;
+
 import lombok.RequiredArgsConstructor;
 
 @Configuration
@@ -20,6 +22,7 @@ public class MarketCodeJobConfig {
 	public Job marketCodeJob(JobRepository jobRepository, Step marketCodeStep) {
 		return new JobBuilder("marketCodeJob", jobRepository)
 			.start(marketCodeStep)
+			.listener(new MarketCodeJobListener())
 			.build();
 	}
 
@@ -28,6 +31,7 @@ public class MarketCodeJobConfig {
 		JobRepository jobRepository, PlatformTransactionManager transactionManager, Tasklet marketCodeTasklet) {
 		return new StepBuilder("marketCodeStep", jobRepository)
 			.tasklet(marketCodeTasklet, transactionManager)
+			.listener(new MarketCodeJobListener())
 			.build();
 	}
 }

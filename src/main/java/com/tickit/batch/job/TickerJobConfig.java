@@ -16,6 +16,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import com.tickit.batch.domain.MarketCode;
 import com.tickit.batch.domain.Ticker;
+import com.tickit.batch.listener.TickerJobListener;
+import com.tickit.batch.listener.TickerStepListener;
 
 import lombok.RequiredArgsConstructor;
 
@@ -34,6 +36,7 @@ public class TickerJobConfig {
 	public Job tickerJob() {
 		return new JobBuilder("tickerJob", jobRepository)
 			.start(tickerStep())
+			.listener(new TickerJobListener())
 			.build();
 	}
 
@@ -45,6 +48,7 @@ public class TickerJobConfig {
 			.processor(tickerProcessor)
 			.writer(tickerWriter)
 			.allowStartIfComplete(true)
+			.listener(new TickerStepListener())
 			.build();
 	}
 }
