@@ -6,7 +6,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 import com.tickit.batch.adapter.upbit.dto.TickerResponse;
-import com.tickit.batch.logging.TraceContext;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -42,14 +41,8 @@ public class Ticker {
 	@Column(name = "timestamp", nullable = false)
 	private LocalDateTime timestamp;
 
-	private Ticker(
-		String market,
-		BigDecimal tradePrice,
-		BigDecimal signedChangePrice,
-		BigDecimal signedChangeRate,
-		BigDecimal accTradeVolume,
-		LocalDateTime timestamp
-	) {
+	private Ticker(String market, BigDecimal tradePrice, BigDecimal signedChangePrice, BigDecimal signedChangeRate,
+		BigDecimal accTradeVolume, LocalDateTime timestamp) {
 		this.market = market;
 		this.tradePrice = tradePrice;
 		this.signedChangePrice = signedChangePrice;
@@ -58,14 +51,8 @@ public class Ticker {
 		this.timestamp = timestamp;
 	}
 
-	public static Ticker of(
-		String market,
-		BigDecimal tradePrice,
-		BigDecimal signedChangePrice,
-		BigDecimal signedChangeRate,
-		BigDecimal accTradeVolume,
-		LocalDateTime timestamp
-	) {
+	public static Ticker of(String market, BigDecimal tradePrice, BigDecimal signedChangePrice,
+		BigDecimal signedChangeRate, BigDecimal accTradeVolume, LocalDateTime timestamp) {
 		return new Ticker(market, tradePrice, signedChangePrice, signedChangeRate, accTradeVolume, timestamp);
 	}
 
@@ -75,16 +62,11 @@ public class Ticker {
 				"마켓 코드 [" + response.getMarket() + "]에 대한 거래 가격(trade_price)이 null 입니다.");
 		}
 
-		return Ticker.of(
-			response.getMarket(),
-			BigDecimal.valueOf(response.getTradePrice()),
+		return Ticker.of(response.getMarket(), BigDecimal.valueOf(response.getTradePrice()),
 			BigDecimal.valueOf(response.getSignedChangePrice() != null ? response.getSignedChangePrice() : 0),
 			BigDecimal.valueOf(response.getSignedChangeRate() != null ? response.getSignedChangeRate() : 0),
 			BigDecimal.valueOf(response.getAccTradeVolume() != null ? response.getAccTradeVolume() : 0),
-			Instant.ofEpochMilli(response.getTimestamp())
-				.atZone(ZoneId.of("Asia/Seoul"))
-				.toLocalDateTime()
-		);
+			Instant.ofEpochMilli(response.getTimestamp()).atZone(ZoneId.of("Asia/Seoul")).toLocalDateTime());
 	}
 
 	public void update(Ticker newTicker) {
@@ -92,62 +74,50 @@ public class Ticker {
 
 		if (this.tradePrice.compareTo(newTicker.tradePrice) != 0) {
 			log.info("""
-					[{}]
-					[Writer] 시세 변동
-					  마켓: {}
-					  tradePrice: {} → {}
-					""",
-				TraceContext.getTraceId(), market,
-				this.tradePrice.toPlainString(), newTicker.tradePrice.toPlainString());
+				[Writer] 시세 변동
+				  마켓: {}
+				  tradePrice: {} → {}
+				""", market, this.tradePrice.toPlainString(), newTicker.tradePrice.toPlainString());
 			changed = true;
 		}
 		if (this.signedChangePrice.compareTo(newTicker.signedChangePrice) != 0) {
 			log.info("""
-					[{}]
-					[Writer] 시세 변동
-					마켓: {}
-					signedChangePrice: {} → {}
-					""", TraceContext.getTraceId(), market,
-				this.signedChangePrice.toPlainString(), newTicker.signedChangePrice.toPlainString());
+				[Writer] 시세 변동
+				마켓: {}
+				signedChangePrice: {} → {}
+				""", market, this.signedChangePrice.toPlainString(), newTicker.signedChangePrice.toPlainString());
 			changed = true;
 		}
 		if (this.signedChangeRate.compareTo(newTicker.signedChangeRate) != 0) {
 			log.info("""
-					[{}]
-					[Writer] 시세 변동
-					마켓: {}
-					signedChangeRate: {} → {}
-					""", TraceContext.getTraceId(), market,
-				this.signedChangeRate.toPlainString(), newTicker.signedChangeRate.toPlainString());
+				[Writer] 시세 변동
+				마켓: {}
+				signedChangeRate: {} → {}
+				""", market, this.signedChangeRate.toPlainString(), newTicker.signedChangeRate.toPlainString());
 			changed = true;
 		}
 		if (this.accTradeVolume.compareTo(newTicker.accTradeVolume) != 0) {
 			log.info("""
-					[{}]
-					[Writer] 시세 변동
-					마켓: {}
-					accTradeVolume: {} → {}
-					""", TraceContext.getTraceId(), market,
-				this.accTradeVolume.toPlainString(), newTicker.accTradeVolume.toPlainString());
+				[Writer] 시세 변동
+				마켓: {}
+				accTradeVolume: {} → {}
+				""", market, this.accTradeVolume.toPlainString(), newTicker.accTradeVolume.toPlainString());
 			changed = true;
 		}
 		if (this.timestamp.compareTo(newTicker.timestamp) != 0) {
 			log.info("""
-					[{}]
-					[Writer] 시세 변동
-					마켓: {}
-					timestamp: {} → {}
-					""", TraceContext.getTraceId(), market,
-				this.timestamp, newTicker.timestamp);
+				[Writer] 시세 변동
+				마켓: {}
+				timestamp: {} → {}
+				""", market, this.timestamp, newTicker.timestamp);
 			changed = true;
 		}
 
 		if (!changed) {
 			log.debug("""
-				[{}]
 				[Writer]
 				마켓 {}: 시세 데이터에 변화 없음
-				""", TraceContext.getTraceId(), market);
+				""", market);
 		}
 
 		this.tradePrice = newTicker.tradePrice;

@@ -1,17 +1,20 @@
 package com.tickit.batch.logging;
 
+import org.slf4j.MDC;
+
 public class TraceContext {
-	private static final ThreadLocal<String> traceIdHolder = new ThreadLocal<>();
+
+	private static final String TRACE_ID = "traceId";
 
 	public static void setTraceId(String traceId) {
-		traceIdHolder.set(traceId);
+		MDC.put(TRACE_ID, traceId);
 	}
 
 	public static String getTraceId() {
-		return traceIdHolder.get();
+		return MDC.get(TRACE_ID);
 	}
 
 	public static void clear() {
-		traceIdHolder.remove();
+		MDC.remove(TRACE_ID);
 	}
 }

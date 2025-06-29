@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 import com.tickit.batch.adapter.upbit.UpbitClient;
 import com.tickit.batch.domain.MarketCode;
 import com.tickit.batch.domain.Ticker;
-import com.tickit.batch.logging.TraceContext;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,26 +26,20 @@ public class TickerProcessor implements ItemProcessor<List<MarketCode>, List<Tic
 		List<String> marketNames = marketCodes.stream()
 			.map(MarketCode::getMarket)
 			.toList();
-
-		// log.info("[Processor] 입력 받은 마켓 수: {}", marketNames.size());
-		log.info("[{}] [Processor] 입력 받은 마켓 수: {}", TraceContext.getTraceId(), marketNames.size());
+		log.info("[Processor] 입력 받은 마켓 수: {}", marketNames.size());
 
 		List<Ticker> tickers = upbitClient.getTickers(marketNames).stream()
 			.map(response -> {
 				try {
 					return Ticker.from(response);
 				} catch (IllegalArgumentException e) {
-					// log.warn("[Processor] Ticker 변환 실패: market = {}, reason = {}", response.getMarket(), e.getMessage());
-					log.warn("[{}] [Processor] Ticker 변환 실패: market = {}, reason = {}", TraceContext.getTraceId(),
-						response.getMarket(), e.getMessage());
+					log.warn("[Processor] Ticker 변환 실패: market = {}, reason = {}", response.getMarket(), e.getMessage());
 					return null;
 				}
 			})
 			.filter(ticker -> ticker != null)
 			.toList();
-
-		// log.info("[Processor] 변환 완료: 생성된 Ticker 수 = {}", tickers.size());
-		log.info("[{}] [Processor] 변환 완료: 생성된 Ticker 수 = {}", TraceContext.getTraceId(), tickers.size());
+		log.info("[Processor] 변환 완료: 생성된 Ticker 수 = {}", tickers.size());
 
 		return tickers;
 	}
