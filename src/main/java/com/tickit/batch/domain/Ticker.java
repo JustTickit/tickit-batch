@@ -9,6 +9,8 @@ import com.tickit.batch.adapter.upbit.dto.TickerResponse;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -23,6 +25,9 @@ import lombok.extern.slf4j.Slf4j;
 public class Ticker {
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+
 	@Column(name = "market", nullable = false, length = 20)
 	private String market;
 

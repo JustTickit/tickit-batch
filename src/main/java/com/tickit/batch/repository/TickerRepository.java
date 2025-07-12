@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 import com.tickit.batch.domain.Ticker;
 
 @Repository
-public interface TickerRepository extends JpaRepository<Ticker, String> {
+public interface TickerRepository extends JpaRepository<Ticker, Long> {
 }
