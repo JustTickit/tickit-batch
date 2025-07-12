@@ -39,13 +39,13 @@ public class TickerWriter implements ItemWriter<List<Ticker>> {
 		for(List<Ticker> tickerList : items){
 			log.info("[Writer] 처리할 Ticker 수: {}", tickerList.size());
 
-			for (Ticker ticker : tickerList){
-				try {
-					tickerRepository.save(ticker);
-					totalSaved.incrementAndGet();
-				} catch (Exception e){
-					log.error("[Writer] Ticker 저장 중 오류 발생: market = {}, error = {}",  ticker.getMarket(), e.getMessage(), e);
-				}
+			try {
+				List<Ticker> savedTickers = tickerRepository.saveAll(tickerList);
+				totalSaved.addAndGet(savedTickers.size());
+
+				log.debug("[Writer] 배치 저장 완료: {}개", savedTickers.size());
+			} catch (Exception e){
+				log.error("[Writer] 배치 저장 중 오류 발생: error = {}", e.getMessage(), e);
 			}
 		}
 
