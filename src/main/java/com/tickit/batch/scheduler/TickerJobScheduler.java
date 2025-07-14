@@ -18,7 +18,7 @@ public class TickerJobScheduler {
 	private final JobLauncher jobLauncher;
 	private final Job tickerJob;
 
-	@Scheduled(fixedRate = 1000)
+	@Scheduled(fixedDelay = 1000)
 	public void runTickerJob() {
 		try {
 			JobParameters jobParameters = new JobParametersBuilder()
