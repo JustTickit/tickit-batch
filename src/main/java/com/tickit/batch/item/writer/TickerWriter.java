@@ -35,21 +35,37 @@ public class TickerWriter implements ItemWriter<List<Ticker>> {
 		log.info("[Writer] Chunk 수신: {}개 리스트", items.size());
 
 		AtomicInteger totalSaved = new AtomicInteger(0);
+		AtomicInteger skippedDuplicates = new AtomicInteger(0);
 
 		for(List<Ticker> tickerList : items){
 			log.info("[Writer] 처리할 Ticker 수: {}", tickerList.size());
 
 			try {
-				List<Ticker> savedTickers = tickerRepository.saveAll(tickerList);
-				totalSaved.addAndGet(savedTickers.size());
-
-				log.debug("[Writer] 배치 저장 완료: {}개", savedTickers.size());
+				List<Ticker> uniqueTickers = tickerList.stream()
+					.filter(ticker -> {
+						boolean isDuplicate = tickerRepository.existsByMarketAndTimestamp(
+							ticker.getMarket(), ticker.getTimestamp());
+						
+						if (isDuplicate) {
+							skippedDuplicates.incrementAndGet();
+						}
+						
+						return !isDuplicate;
+					})
+					.toList();
+				
+				if (!uniqueTickers.isEmpty()) {
+					List<Ticker> savedTickers = tickerRepository.saveAll(uniqueTickers);
+					totalSaved.addAndGet(savedTickers.size());
+				}
+				
 			} catch (Exception e){
 				log.error("[Writer] 배치 저장 중 오류 발생: error = {}", e.getMessage(), e);
 			}
 		}
 
-		log.info("[Writer] 저장 완료 - 신규 저장: {}개", totalSaved.get());
+		log.info("[Writer] 저장 완료 - 신규 저장: {}개, 중복 스킵: {}개", 
+			totalSaved.get(), skippedDuplicates.get());
 
 		MDC.remove("traceId");
 	}
