@@ -33,10 +33,12 @@ dependencies {
 
 	implementation 'net.javacrumbs.shedlock:shedlock-spring:5.10.0'
 	implementation 'net.javacrumbs.shedlock:shedlock-provider-jdbc-template:5.10.0'
+
+	implementation 'org.springframework.boot:spring-boot-starter-amqp'
 }
 
 springBoot {
-	mainClass = 'com.tickit.batch.launch.BatchJobLauncher'
+	mainClass = 'com.tickit.batch.TickitBatchApplication'
 }
 
 tasks.named('test') {
