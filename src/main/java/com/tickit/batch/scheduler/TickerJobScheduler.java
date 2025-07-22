@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 
 @Slf4j
 @Component
@@ -21,7 +20,6 @@ public class TickerJobScheduler {
     private final Job tickerJob;
     private final JobExplorer jobExplorer;
 
-    @SchedulerLock(name = "TickerJobScheduler_run", lockAtMostFor = "PT10S", lockAtLeastFor = "PT1S")
     @Scheduled(fixedDelay = 1000)
     public void runTickerJob() {
         if (isJobRunning("tickerJob")) {
