@@ -36,7 +36,7 @@ dependencies {
 }
 
 springBoot {
-	mainClass = 'com.tickit.batch.launch.BatchJobLauncher'
+	mainClass = 'com.tickit.batch.TickitBatchApplication'
 }
 
 tasks.named('test') {
