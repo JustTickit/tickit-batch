@@ -14,4 +14,6 @@ import com.tickit.batch.domain.Ticker;
 public interface TickerRepository extends JpaRepository<Ticker, Long> {
 
 	boolean existsByMarketAndTimestamp(String market, LocalDateTime timestamp);
+
+	List<Ticker> findAllByTimestamp(LocalDateTime timestamp);
 }
